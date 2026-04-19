@@ -29,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalFoundationApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -47,6 +48,7 @@ import coil.request.ImageRequest
 import com.minimal.gallery.domain.model.MediaItem
 import com.minimal.gallery.domain.model.MediaType
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ViewerScreen(
     mediaItems: List<MediaItem>,
