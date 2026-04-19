@@ -21,6 +21,8 @@ import com.minimal.gallery.ui.screens.settings.SettingsScreen
 import com.minimal.gallery.ui.screens.viewer.ViewerScreen
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
 
 sealed class Screen(val route: String) {
     object Home : Screen("home")
@@ -42,48 +44,37 @@ data class SerializableMediaItem(
     val duration: Long?
 )
 
-object MediaItemListSerializer : kotlinx.serialization.KSerializer<MediaItemList> {
-    override val descriptor = kotlinx.serialization.builtins.ListSerializer(
-        kotlinx.serialization.builtins.serializer<SerializableMediaItem>()
-    ).descriptor
+@kotlinx.serialization.Serializable
+data class SerializableMediaItemList(val items: List<SerializableMediaItem>)
 
-    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: MediaItemList) {
-        val serializableList = value.items.map { item ->
-            SerializableMediaItem(
-                id = item.id,
-                uriString = item.uri.toString(),
-                type = item.type.name,
-                dateModified = item.dateModified,
-                folderName = item.folderName,
-                folderPath = item.folderPath,
-                displayName = item.displayName,
-                duration = item.duration
-            )
-        }
-        encoder.encodeSerializableValue(
-            kotlinx.serialization.builtins.ListSerializer(kotlinx.serialization.builtins.serializer<SerializableMediaItem>()), 
-            serializableList
+fun MediaItemList.toSerializable(): SerializableMediaItemList {
+    return SerializableMediaItemList(items.map { item ->
+        SerializableMediaItem(
+            id = item.id,
+            uriString = item.uri.toString(),
+            type = item.type.name,
+            dateModified = item.dateModified,
+            folderName = item.folderName,
+            folderPath = item.folderPath,
+            displayName = item.displayName,
+            duration = item.duration
         )
-    }
+    })
+}
 
-    override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): MediaItemList {
-        val serializableList = decoder.decodeSerializableValue(
-            kotlinx.serialization.builtins.ListSerializer(kotlinx.serialization.builtins.serializer<SerializableMediaItem>())
+fun SerializableMediaItemList.toDomain(): MediaItemList {
+    return MediaItemList(items.map { item ->
+        MediaItem(
+            id = item.id,
+            uri = android.net.Uri.parse(item.uriString),
+            type = com.minimal.gallery.domain.model.MediaType.valueOf(item.type),
+            dateModified = item.dateModified,
+            folderName = item.folderName,
+            folderPath = item.folderPath,
+            displayName = item.displayName,
+            duration = item.duration
         )
-        val items = serializableList.map { item ->
-            MediaItem(
-                id = item.id,
-                uri = android.net.Uri.parse(item.uriString),
-                type = com.minimal.gallery.domain.model.MediaType.valueOf(item.type),
-                dateModified = item.dateModified,
-                folderName = item.folderName,
-                folderPath = item.folderPath,
-                displayName = item.displayName,
-                duration = item.duration
-            )
-        }
-        return MediaItemList(items)
-    }
+    })
 }
 
 @Composable
@@ -116,7 +107,7 @@ fun AppNavGraph(
                 onMediaClick = { mediaItem ->
                     // For MVP, pass single item - in production load surrounding context
                     val itemList = MediaItemList(listOf(mediaItem))
-                    val json = Json.encodeToString(MediaItemListSerializer(), itemList)
+                    val json = Json.encodeToString(itemList.toSerializable())
                     navController.navigate("viewer/${json}/0")
                 }
             )
@@ -132,24 +123,19 @@ fun AppNavGraph(
             val json = backStackEntry.arguments?.getString("mediaItemsJson") ?: ""
             val initialIndex = backStackEntry.arguments?.getInt("initialIndex") ?: 0
             
-            try {
-                val mediaItemList = Json.decodeFromString(MediaItemListSerializer(), json)
-                ViewerScreen(
-                    mediaItems = mediaItemList.items,
-                    initialIndex = initialIndex,
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    }
-                )
+            val mediaItemList = try {
+                Json.decodeFromString<SerializableMediaItemList>(json).toDomain()
             } catch (e: Exception) {
-                ViewerScreen(
-                    mediaItems = emptyList(),
-                    initialIndex = 0,
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    }
-                )
+                MediaItemList(emptyList())
             }
+            
+            ViewerScreen(
+                mediaItems = mediaItemList.items,
+                initialIndex = initialIndex,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
         }
         
         composable(Screen.Settings.route) {
