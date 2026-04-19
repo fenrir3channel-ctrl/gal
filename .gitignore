@@ -3,24 +3,33 @@
 *.class
 *.o
 *.obj
-*.so
-*.dll
 *.exe
+*.dll
+*.so
+*.a
 *.out
 build/
-target/
+dist/
 
 # Dependencies
-.gradle/
 node_modules/
 venv/
 .venv/
 __pycache__/
 .mypy_cache/
 .pytest_cache/
-dist/
-julia-*/
-zig*/
+target/
+.gradle/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Environment
+.env
+.env.local
+*.env.*
 
 # Editors
 .vscode/
@@ -28,18 +37,11 @@ zig*/
 *.swp
 *.swo
 
-# System files
+# System
 .DS_Store
 Thumbs.db
-.env
-.env.local
-*.env.*
 
-# Logs and temporary files
-*.log
-*.tmp
-
-# Coverage reports
+# Coverage
 coverage/
 htmlcov/
 .coverage
