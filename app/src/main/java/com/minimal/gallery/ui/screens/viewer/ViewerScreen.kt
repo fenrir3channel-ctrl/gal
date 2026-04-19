@@ -22,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -35,7 +36,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.media3.common.MediaItem
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.media3.common.MediaItem as ExoMediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
@@ -171,10 +173,18 @@ fun ImageViewer(mediaItem: MediaItem) {
 @Composable
 fun VideoViewer(mediaItem: MediaItem) {
     val context = LocalContext.current
+    
     val exoPlayer = remember {
-        ExoPlayer.Builder(context).build().apply {
-            setMediaItem(MediaItem.fromUri(mediaItem.uri))
-            prepare()
+        ExoPlayer.Builder(context).build()
+    }
+    
+    DisposableEffect(Unit) {
+        exoPlayer.setMediaItem(ExoMediaItem.fromUri(mediaItem.uri))
+        exoPlayer.prepare()
+        exoPlayer.playWhenReady = true
+        
+        onDispose {
+            exoPlayer.release()
         }
     }
     
@@ -196,24 +206,4 @@ fun VideoViewer(mediaItem: MediaItem) {
             modifier = Modifier.fillMaxSize()
         )
     }
-}
-
-// Simple AndroidView wrapper for PlayerView
-@Composable
-fun AndroidView(
-    factory: (android.content.Context) -> android.view.View,
-    modifier: Modifier = Modifier,
-    update: ((android.view.View) -> Unit)? = null
-) {
-    val view = remember(factory) {
-        factory(LocalContext.current)
-    }
-    
-    update?.let { it(view) }
-    
-    androidx.compose.ui.platform.AndroidView(
-        factory = { factory(it) },
-        modifier = modifier,
-        update = update
-    )
 }

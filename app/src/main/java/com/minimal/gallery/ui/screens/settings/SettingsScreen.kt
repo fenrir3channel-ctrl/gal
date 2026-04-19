@@ -32,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,6 +57,13 @@ fun SettingsScreen(
 ) {
     val currentTheme by settingsRepository.themeFlow.collectAsState(initial = AppTheme.SYSTEM)
     var selectedTheme by remember { mutableStateOf(currentTheme) }
+    
+    // Update theme when user selects
+    LaunchedEffect(selectedTheme) {
+        if (selectedTheme != currentTheme) {
+            settingsRepository.setTheme(selectedTheme)
+        }
+    }
     
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     
@@ -91,7 +99,6 @@ fun SettingsScreen(
                         selected = selectedTheme == AppTheme.LIGHT,
                         onClick = {
                             selectedTheme = AppTheme.LIGHT
-                            // Note: In real app, save to repository
                         }
                     )
                     ThemeOption(
@@ -128,11 +135,11 @@ fun SettingsScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     } else {
-                        items(folders) { folder ->
+                        items(folders.size) { index ->
                             FolderItem(
-                                folder = folder,
+                                folder = folders[index],
                                 onToggle = { isChecked ->
-                                    onFolderToggle(folder.path, isChecked)
+                                    onFolderToggle(folders[index].path, isChecked)
                                 }
                             )
                         }
