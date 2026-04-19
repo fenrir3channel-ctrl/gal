@@ -136,9 +136,21 @@ fun ImageViewer(mediaItem: MediaItem) {
             .fillMaxSize()
             .pointerInput(Unit) {
                 detectTransformGestures { _, pan, zoom, _ ->
-                    scale = (scale * zoom).coerceIn(0.5f, 5f)
-                    offsetX += pan.x
-                    offsetY += pan.y
+                    val newScale = (scale * zoom).coerceIn(0.5f, 5f)
+                    
+                    // Ограничиваем смещение чтобы изображение не улетало за пределы экрана
+                    if (newScale > 1f) {
+                        val maxOffsetX = (size.width * (newScale - 1) / 2)
+                        val maxOffsetY = (size.height * (newScale - 1) / 2)
+                        
+                        offsetX = (offsetX + pan.x).coerceIn(-maxOffsetX, maxOffsetX)
+                        offsetY = (offsetY + pan.y).coerceIn(-maxOffsetY, maxOffsetY)
+                    } else {
+                        offsetX = 0f
+                        offsetY = 0f
+                    }
+                    
+                    scale = newScale
                 }
             },
         contentAlignment = Alignment.Center
@@ -158,11 +170,6 @@ fun ImageViewer(mediaItem: MediaItem) {
                 }
                 .aspectRatio(1f)
         )
-        
-        // Reset zoom on double tap (simplified)
-        if (scale != 1f) {
-            // Could add double tap gesture here
-        }
     }
 }
 
