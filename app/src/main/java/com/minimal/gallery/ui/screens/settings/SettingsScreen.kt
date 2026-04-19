@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.FolderOff
@@ -75,7 +75,7 @@ fun SettingsScreen(
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "Back"
                         )
                     }
@@ -124,26 +124,33 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
             
-            // Excluded folders section
+            // Excluded folders section header
             item {
-                SettingsSection(title = "Excluded Folders (${folders.count { it.isExcluded }})") {
-                    if (folders.isEmpty()) {
-                        Text(
-                            text = "No folders found",
-                            modifier = Modifier.padding(16.dp),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    } else {
-                        items(folders.size) { index ->
-                            FolderItem(
-                                folder = folders[index],
-                                onToggle = { isChecked ->
-                                    onFolderToggle(folders[index].path, isChecked)
-                                }
-                            )
+                Text(
+                    text = "Excluded Folders (${folders.count { it.isExcluded }})",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
+            
+            if (folders.isEmpty()) {
+                item {
+                    Text(
+                        text = "No folders found",
+                        modifier = Modifier.padding(16.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                items(folders) { folder ->
+                    FolderItem(
+                        folder = folder,
+                        onToggle = { isChecked ->
+                            onFolderToggle(folder.path, isChecked)
                         }
-                    }
+                    )
                 }
             }
         }

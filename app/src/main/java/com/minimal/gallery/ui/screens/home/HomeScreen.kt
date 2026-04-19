@@ -40,7 +40,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import coil.video.VideoDecoder
 import com.minimal.gallery.data.SettingsRepository
 import com.minimal.gallery.data.repository.MediaRepository
 import com.minimal.gallery.domain.model.MediaItem
@@ -184,12 +183,7 @@ fun MediaGridItem(
                 .build(),
             contentDescription = mediaItem.displayName,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize(),
-            imageLoader = ImageLoader.Builder(context)
-                .components {
-                    add(VideoDecoder.Factory())
-                }
-                .build()
+            modifier = Modifier.fillMaxSize()
         )
         
         // Video indicator
