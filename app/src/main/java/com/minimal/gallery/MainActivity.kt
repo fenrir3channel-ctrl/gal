@@ -3,6 +3,7 @@ package com.minimal.gallery
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -11,9 +12,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.compose.rememberNavController
 import com.minimal.gallery.data.SettingsRepository
 import com.minimal.gallery.data.repository.MediaRepository
-import com.minimal.gallery.ui.screens.home.HomeScreen
+import com.minimal.gallery.navigation.AppNavGraph
 import com.minimal.gallery.ui.theme.AppTheme
 import com.minimal.gallery.ui.theme.MinimalGalleryTheme
 import kotlinx.coroutines.flow.first
@@ -74,7 +76,10 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background
                     ) {
-                        HomeScreen(
+                        val navController = rememberNavController()
+                        
+                        AppNavGraph(
+                            navController = navController,
                             mediaRepository = mediaRepository,
                             settingsRepository = settingsRepository,
                             onThemeChange = { newTheme ->
