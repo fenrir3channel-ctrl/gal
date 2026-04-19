@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,7 +44,6 @@ import androidx.media3.ui.PlayerView
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import coil.video.VideoDecoder
 import com.minimal.gallery.domain.model.MediaItem
 import com.minimal.gallery.domain.model.MediaType
 
@@ -88,7 +87,7 @@ fun ViewerScreen(
                 )
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    imageVector = Icons.Filled.ArrowBack,
                     contentDescription = "Back",
                     tint = Color.White
                 )
@@ -155,12 +154,7 @@ fun ImageViewer(mediaItem: MediaItem) {
                     translationX = offsetX
                     translationY = offsetY
                 }
-                .aspectRatio(1f),
-            imageLoader = ImageLoader.Builder(context)
-                .components {
-                    add(VideoDecoder.Factory())
-                }
-                .build()
+                .aspectRatio(1f)
         )
         
         // Reset zoom on double tap (simplified)
