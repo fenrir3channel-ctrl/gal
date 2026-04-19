@@ -20,6 +20,7 @@ import com.minimal.gallery.ui.screens.home.HomeScreen
 import com.minimal.gallery.ui.screens.settings.SettingsScreen
 import com.minimal.gallery.ui.screens.viewer.ViewerScreen
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
